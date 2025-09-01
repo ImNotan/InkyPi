@@ -124,7 +124,13 @@ def take_screenshot(target, dimensions, timeout_ms=None):
             "--disable-extensions",
             "--disable-plugins",
             "--mute-audio",
-            "--no-sandbox"
+            "--no-sandbox",
+            "--disable-canvas-aa",
+            "--disable-2d-canvas-clip-aa",
+            "--disable-font-subpixel-positioning",
+            "--disable-lcd-text",
+            "--disable-gpu-compositing",
+            "--disable-dithering"
         ]
         if timeout_ms:
             command.append(f"--timeout={timeout_ms}")
