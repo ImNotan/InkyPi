@@ -5,6 +5,10 @@
   padding: 0;
 }
 
+html, body {
+  image-rendering: pixelated;
+}
+
 .weather-dashboard {
   display: flex;
   flex-direction: column;
