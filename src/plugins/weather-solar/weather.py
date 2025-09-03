@@ -42,7 +42,7 @@ OPEN_METEO_UNIT_PARAMS = {
 
 SOLAR_URL = "http://192.168.178.86/api/status/powerflow"
 
-class Weather(BasePlugin):
+class Weathersolar(BasePlugin):
     def generate_settings_template(self):
         template_params = super().generate_settings_template()
         template_params['api_key'] = {
