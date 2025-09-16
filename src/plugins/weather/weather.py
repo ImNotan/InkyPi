@@ -619,6 +619,9 @@ class Weather(BasePlugin):
         
         return response.json()
 
+    def get_sensor_data(self):
+        return
+
     def get_open_meteo_air_quality(self, lat, long):
         url = OPEN_METEO_AIR_QUALITY_URL.format(lat=lat, long=long)
         response = requests.get(url)
