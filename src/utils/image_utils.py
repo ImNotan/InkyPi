@@ -108,7 +108,7 @@ def take_screenshot(target, dimensions, timeout_ms=None):
             img_file_path = img_file.name
 
         command = [
-            "chromium-headless-shell",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             target,
             "--headless",
             f"--screenshot={img_file_path}",

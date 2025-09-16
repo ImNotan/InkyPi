@@ -26,8 +26,6 @@ UNITS = {
     }
 }
 
-data = ()
-
 WEATHER_URL = "https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={long}&units={units}&exclude=minutely&appid={api_key}"
 AIR_QUALITY_URL = "http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={long}&appid={api_key}"
 GEOCODING_URL = "http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={long}&limit=1&appid={api_key}"
@@ -90,13 +88,10 @@ class Weathersolar(BasePlugin):
                 forecast_days = 7
                 weather_data = self.get_open_meteo_data(lat, long, units, forecast_days + 1)
                 aqi_data = self.get_open_meteo_air_quality(lat, long)
-                template_params = self.parse_open_meteo_data(weather_data, aqi_data, tz, units, time_format)
+                solar_data = self.get_solar_data()
+                template_params = self.parse_open_meteo_data(weather_data, aqi_data, solar_data, tz, units, time_format)
             else:
                 raise RuntimeError(f"Unknown weather provider: {weather_provider}")
-            
-            if "Fronius" == "Fronius":
-                solar_data = self.get_solar_data()
-                template_params = self.parse_solar_data(solar_data)
 
 
             template_params['title'] = title
@@ -143,7 +138,7 @@ class Weathersolar(BasePlugin):
         data['hourly_forecast'] = self.parse_hourly(weather_data.get('hourly'), tz, time_format, units)
         return data
 
-    def parse_open_meteo_data(self, weather_data, aqi_data, tz, units, time_format):
+    def parse_open_meteo_data(self, weather_data, aqi_data, solar_data, tz, units, time_format):
         current = weather_data.get("current_weather", {})
         dt = datetime.fromisoformat(current.get('time')).astimezone(tz) if current.get('time') else datetime.now(tz)
         weather_code = current.get("weathercode", 0)
@@ -160,20 +155,9 @@ class Weathersolar(BasePlugin):
         }
 
         data['forecast'] = self.parse_open_meteo_forecast(weather_data.get('daily', {}), tz)
-        data['data_points'] = self.parse_open_meteo_data_points(weather_data, aqi_data, tz, units, time_format)
+        data['data_points'] = self.parse_open_meteo_data_points(weather_data, aqi_data, solar_data, tz, units, time_format)
         
         data['hourly_forecast'] = self.parse_open_meteo_hourly(weather_data.get('hourly', {}), tz, time_format)
-        return data
-    
-    def parse_solar_data(self, solar_data):
-        soc = solar_data.get("SOC")
-
-        data['data_points'].append({
-            "label": "Battery",
-            "measurement": str(round(soc, 0)),
-            "unit": "%",
-            "icon": self.get_plugin_dir('icons/battery.png')
-        })
         return data
 
     def map_weather_code_to_icon(self, weather_code, hour):
@@ -451,7 +435,7 @@ class Weathersolar(BasePlugin):
 
         return data_points
 
-    def parse_open_meteo_data_points(self, weather_data, aqi_data, tz, units, time_format):
+    def parse_open_meteo_data_points(self, weather_data, aqi_data, solar_data, tz, units, time_format):
         """Parses current data points from Open-Meteo API response."""
         data_points = []
         daily_data = weather_data.get('daily', {})
@@ -492,6 +476,16 @@ class Weathersolar(BasePlugin):
         data_points.append({
             "label": "Wind", "measurement": wind_speed, "unit": wind_unit,
             "icon": self.get_plugin_dir('icons/wind.png')
+        })
+
+        #Solar Power
+        solar_power_measurement = round(solar_data.get('site', [{}]).get('P_PV'), 0)
+        solar_power_unit = "W"
+        data_points.append({
+            "label": "Solar Power",
+            "measurement": solar_power_measurement,
+            "unit": solar_power_unit,
+            "icon": self.get_plugin_dir('icons/solar_power.png')
         })
 
         # Humidity
@@ -594,6 +588,46 @@ class Weathersolar(BasePlugin):
             "unit": scale, "icon": self.get_plugin_dir('icons/aqi.png')
         })
 
+        #Battery
+        battery_percentage = round(solar_data.get('inverters', [{}])[0].get('SOC'), 0)
+        battery_unit = "%"
+        data_points.append({
+            "label": "Battery",
+            "measurement": battery_percentage,
+            "unit": battery_unit,
+            "icon": self.get_plugin_dir('icons/battery.png')
+        })
+
+        #Power Load
+        load_measurement = round(solar_data.get('site', [{}]).get('P_Load'), 0)
+        load_power_unit = "W"
+        data_points.append({
+            "label": "Load",
+            "measurement": load_measurement,
+            "unit": load_power_unit,
+            "icon": self.get_plugin_dir('icons/load.png')
+        })
+
+        #Power Grid
+        grid_measurement = round(solar_data.get('site', [{}]).get('P_Grid'), 0)
+        grid_power_unit = "W"
+        data_points.append({
+            "label": "Grid",
+            "measurement": grid_measurement,
+            "unit": grid_power_unit,
+            "icon": self.get_plugin_dir('icons/grid.png')
+        })
+
+        #Power Battery
+        # battery_measurement = round(solar_data.get('site', [{}]).get('P_Akku'), 0)
+        # battery_power_unit = "W"
+        # data_points.append({
+        #     "label": "Battery Power",
+        #     "measurement": battery_measurement,
+        #     "unit": battery_power_unit,
+        #     "icon": self.get_plugin_dir('icons/battery.png')
+        # })
+
         return data_points
 
     def get_weather_data(self, api_key, units, lat, long):
@@ -648,7 +682,7 @@ class Weathersolar(BasePlugin):
         
         return response.json()
     
-    def get_solar_data():
+    def get_solar_data(self):
         response = requests.get(SOLAR_URL)
 
         if not 200 <= response.status_code < 300:

@@ -1,6 +1,60 @@
 {
     "name": "InkyPi Development",
     "display_type": "mock",
-    "resolution": [800, 480],
-    "orientation": "horizontal"
+    "resolution": [
+        800,
+        480
+    ],
+    "orientation": "horizontal",
+    "playlist_config": {
+        "playlists": [
+            {
+                "name": "Default",
+                "start_time": "00:00",
+                "end_time": "24:00",
+                "plugins": [
+                    {
+                        "plugin_id": "weather-solar",
+                        "name": "w",
+                        "plugin_settings": {
+                            "latitude": "48.72575796812259",
+                            "longitude": "11.25",
+                            "weatherProvider": "OpenMeteo",
+                            "units": "metric",
+                            "titleSelection": "custom",
+                            "customTitle": "w",
+                            "displayRefreshTime": "true",
+                            "displayMetrics": "true",
+                            "displayGraph": "true",
+                            "displayRain": "true",
+                            "displayForecast": "true",
+                            "forecastDays": "7",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 3600
+                        },
+                        "latest_refresh_time": "2025-09-16T13:50:30.382996+00:00"
+                    }
+                ],
+                "current_plugin_index": 0
+            }
+        ],
+        "active_playlist": "Default"
+    },
+    "refresh_info": {
+        "refresh_time": "2025-09-16T13:50:30.382996+00:00",
+        "image_hash": "974b7b630c0f93c91139054e90bdc2701df13dc1f8dd189be10cb20fe99891c1",
+        "refresh_type": "Playlist",
+        "plugin_id": "weather-solar",
+        "playlist": "Default",
+        "plugin_instance": "w"
+    }
 }
