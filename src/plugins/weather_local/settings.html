@@ -17,7 +17,6 @@
 <div class="form-group">
     <label for="weatherProvider" class="form-label">Weather Provider:</label>
     <select id="weatherProvider" name="weatherProvider" class="form-input" onchange="updateTitleOptions(this.value)">
-        <option value="OpenWeatherMap">OpenWeatherMap</option>
         <option value="OpenMeteo">Open-Meteo</option>
     </select>
 
@@ -152,7 +151,7 @@
         let longitude = +$longitude.value;
         let zoom = latitude && longitude ? 4.5 : 2.5;
         let selectedTitle = 'location';
-        let weatherProvider = 'OpenWeatherMap';
+        let weatherProvider = 'OpenMeteo';
 
         let map, marker;
 
@@ -206,21 +205,21 @@
 
             document.getElementById('weatherTimeZone').value = pluginSettings.weatherTimeZone;
             
-            selectedTitle = pluginSettings.titleSelection || 'location';
-            weatherProvider = pluginSettings.weatherProvider || 'OpenWeatherMap';
+            selectedTitle = pluginSettings.titleSelection || 'custom';
+            weatherProvider = pluginSettings.weatherProvider || 'OpenMeteo';
 
             document.getElementById('customTitle').value = pluginSettings.customTitle || '';
         } else {
             // set default values
-            document.getElementById('units').value = "imperial";
+            document.getElementById('units').value = "metric";
             document.getElementById('displayRefreshTime').checked = true;
             document.getElementById('displayRefreshTime').value = "true";
             document.getElementById('displayMetrics').checked = true;
             document.getElementById('displayMetrics').value = "true";
             document.getElementById('displayGraph').checked = true;
             document.getElementById('displayGraph').value = "true";
-			document.getElementById('displayRain').checked = false;
-            document.getElementById('displayRain').value = "false";
+			document.getElementById('displayRain').checked = true;
+            document.getElementById('displayRain').value = "true";
             document.getElementById('displayForecast').checked = true;
             document.getElementById('displayForecast').value = "true";
             document.getElementById('forecastDays').value = 7;

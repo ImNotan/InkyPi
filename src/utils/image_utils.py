@@ -107,8 +107,27 @@ def take_screenshot(target, dimensions, timeout_ms=None):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_file:
             img_file_path = img_file.name
 
+        # command = [
+        #     "chromium-headless-shell",
+        #     target,
+        #     "--headless",
+        #     f"--screenshot={img_file_path}",
+        #     f"--window-size={dimensions[0]},{dimensions[1]}",
+        #     "--disable-dev-shm-usage",
+        #     "--disable-gpu",
+        #     "--use-gl=swiftshader",
+        #     "--hide-scrollbars",
+        #     "--in-process-gpu",
+        #     "--js-flags=--jitless",
+        #     "--disable-zero-copy",
+        #     "--disable-gpu-memory-buffer-compositor-resources",
+        #     "--disable-extensions",
+        #     "--disable-plugins",
+        #     "--mute-audio",
+        #     "--no-sandbox"
+        # ]
         command = [
-            "chromium-headless-shell",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             target,
             "--headless",
             f"--screenshot={img_file_path}",
@@ -124,8 +143,15 @@ def take_screenshot(target, dimensions, timeout_ms=None):
             "--disable-extensions",
             "--disable-plugins",
             "--mute-audio",
-            "--no-sandbox"
+            "--no-sandbox",
+            "--disable-canvas-aa",
+            "--disable-2d-canvas-clip-aa",
+            "--disable-font-subpixel-positioning",
+            "--disable-lcd-text",
+            "--disable-gpu-compositing",
+            "--disable-dithering"
         ]
+
         if timeout_ms:
             command.append(f"--timeout={timeout_ms}")
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

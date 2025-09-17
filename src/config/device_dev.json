@@ -1,6 +1,27 @@
 {
     "name": "InkyPi Development",
     "display_type": "mock",
-    "resolution": [800, 480],
-    "orientation": "horizontal"
+    "resolution": [
+        800,
+        480
+    ],
+    "orientation": "horizontal",
+    "playlist_config": {
+        "playlists": [
+            {
+                "name": "Default",
+                "start_time": "00:00",
+                "end_time": "24:00",
+                "plugins": [],
+                "current_plugin_index": null
+            }
+        ],
+        "active_playlist": null
+    },
+    "refresh_info": {
+        "refresh_time": "2025-09-17T14:01:45.895775+00:00",
+        "image_hash": "86b92bcb01eeeddbbfa62df19992c8168c028da2775745c117ab3b45dae326fc",
+        "refresh_type": "Manual Update",
+        "plugin_id": "weather_local"
+    }
 }
