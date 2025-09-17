@@ -74,7 +74,7 @@
   justify-content: center;
   width: 50%;
   padding: 0 2vw;
-  height: 50%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .current-temp {
-  font-size: 45cqmin;
+  font-size: 35cqmin;
   text-align: center;
   align-content: end;
   position: relative;

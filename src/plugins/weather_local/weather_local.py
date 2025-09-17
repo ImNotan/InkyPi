@@ -115,7 +115,7 @@ class Weather_local(BasePlugin):
             "current_day_icon": self.get_plugin_dir(f'icons/{current_icon}.png'),
             "current_temperature": str(round(current.get("temperature", 0))),
             "feels_like": str(round(current.get("apparent_temperature", current.get("temperature", 0)))),
-            "indoor_temperature": round(sensor_data['temperature'], 0),
+            "indoor_temperature": round(sensor_data['temperature'], 1),
             "temperature_unit": UNITS[units]["temperature"],
             "units": units,
             "time_format": time_format
