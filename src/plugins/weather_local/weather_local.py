@@ -472,16 +472,16 @@ class Weather_local(BasePlugin):
         })
 
         # Indoor Humidity
-        current_indoor_humidity = round(sensor_data['humidity'], 0)
+        current_indoor_humidity = int(round(sensor_data['humidity'], 0))
         data_points.append({
-            "label": "Humidity", "measurement": current_indoor_humidity, "unit": '%',
+            "label": "Indoor Humidity", "measurement": current_indoor_humidity, "unit": '%',
             "icon": self.get_plugin_dir('icons/humidity.png')
         })
 
         # Indoor Pressure
-        current_indoor_pressure = round(sensor_data['pressure'], 0)
+        current_indoor_pressure = int(round(sensor_data['pressure'], 0))
         data_points.append({
-            "label": "Pressure", "measurement": current_indoor_pressure, "unit": 'hPa',
+            "label": "Indoor Pressure", "measurement": current_indoor_pressure, "unit": 'hPa',
             "icon": self.get_plugin_dir('icons/pressure.png')
         })
 
