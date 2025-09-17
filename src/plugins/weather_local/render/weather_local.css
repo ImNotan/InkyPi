@@ -90,7 +90,7 @@
 }
 
 .current-temp {
-  font-size: 30cqmin;
+  font-size: 25cqmin;
   text-align: center;
   align-content: end;
   position: relative;
@@ -101,7 +101,7 @@
   font-size: 0.4em;
   position: absolute;
   /*top: 0.6em;*/
-  top: 1.0em;
+  top: 1.5em;
 }
 
 
