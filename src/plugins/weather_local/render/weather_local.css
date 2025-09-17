@@ -90,7 +90,7 @@
 }
 
 .current-temp {
-  font-size: 35cqmin;
+  font-size: 30cqmin;
   text-align: center;
   align-content: end;
   position: relative;
@@ -100,7 +100,8 @@
 .temperature-unit {
   font-size: 0.4em;
   position: absolute;
-  top: 0.6em;
+  /*top: 0.6em;*/
+  top: 1.0em;
 }
 
 
