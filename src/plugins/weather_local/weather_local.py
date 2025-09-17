@@ -8,6 +8,13 @@ import pytz
 from io import BytesIO
 import math
 
+from smbus2 import SMBus
+from bme280 import BME280
+
+# Initialise the BME280
+bus = SMBus(1)
+bme280 = BME280(i2c_dev=bus)
+
 logger = logging.getLogger(__name__)
 
 UNITS = {
@@ -67,7 +74,8 @@ class Weather_local(BasePlugin):
                 forecast_days = 7
                 weather_data = self.get_open_meteo_data(lat, long, units, forecast_days + 1)
                 aqi_data = self.get_open_meteo_air_quality(lat, long)
-                template_params = self.parse_open_meteo_data(weather_data, aqi_data, tz, units, time_format)
+                sensor_data = self.get_sensor_data()
+                template_params = self.parse_open_meteo_data(weather_data, aqi_data, sensor_data, tz, units, time_format)
             else:
                 raise RuntimeError(f"Unknown weather provider: {weather_provider}")
 
@@ -96,7 +104,7 @@ class Weather_local(BasePlugin):
             raise RuntimeError("Failed to take screenshot, please check logs.")
         return image
 
-    def parse_open_meteo_data(self, weather_data, aqi_data, tz, units, time_format):
+    def parse_open_meteo_data(self, weather_data, aqi_data, sensor_data, tz, units, time_format):
         current = weather_data.get("current_weather", {})
         dt = datetime.fromisoformat(current.get('time')).astimezone(tz) if current.get('time') else datetime.now(tz)
         weather_code = current.get("weathercode", 0)
@@ -107,13 +115,14 @@ class Weather_local(BasePlugin):
             "current_day_icon": self.get_plugin_dir(f'icons/{current_icon}.png'),
             "current_temperature": str(round(current.get("temperature", 0))),
             "feels_like": str(round(current.get("apparent_temperature", current.get("temperature", 0)))),
+            "indoor_temperature": round(sensor_data['temperature'], 0),
             "temperature_unit": UNITS[units]["temperature"],
             "units": units,
             "time_format": time_format
         }
 
         data['forecast'] = self.parse_open_meteo_forecast(weather_data.get('daily', {}), tz)
-        data['data_points'] = self.parse_open_meteo_data_points(weather_data, aqi_data, tz, units, time_format)
+        data['data_points'] = self.parse_open_meteo_data_points(weather_data, aqi_data, sensor_data, tz, units, time_format)
         
         data['hourly_forecast'] = self.parse_open_meteo_hourly(weather_data.get('hourly', {}), tz, time_format)
         return data
@@ -319,7 +328,7 @@ class Weather_local(BasePlugin):
             hourly.append(hour_forecast)
         return hourly
 
-    def parse_open_meteo_data_points(self, weather_data, aqi_data, tz, units, time_format):
+    def parse_open_meteo_data_points(self, weather_data, aqi_data, sensor_data, tz, units, time_format):
         """Parses current data points from Open-Meteo API response."""
         data_points = []
         daily_data = weather_data.get('daily', {})
@@ -462,6 +471,20 @@ class Weather_local(BasePlugin):
             "unit": scale, "icon": self.get_plugin_dir('icons/aqi.png')
         })
 
+        # Indoor Humidity
+        current_indoor_humidity = round(sensor_data['humidity'], 0)
+        data_points.append({
+            "label": "Humidity", "measurement": current_indoor_humidity, "unit": '%',
+            "icon": self.get_plugin_dir('icons/humidity.png')
+        })
+
+        # Indoor Pressure
+        current_indoor_pressure = round(sensor_data['pressure'], 0)
+        data_points.append({
+            "label": "Pressure", "measurement": current_indoor_pressure, "unit": 'hPa',
+            "icon": self.get_plugin_dir('icons/pressure.png')
+        })
+
         return data_points
 
     def get_open_meteo_data(self, lat, long, units, forecast_days):
@@ -476,7 +499,12 @@ class Weather_local(BasePlugin):
         return response.json()
 
     def get_sensor_data(self):
-        return
+        sensor_data = {}
+        sensor_data['temperature'] = bme280.get_temperature()
+        sensor_data['pressure'] = bme280.get_pressure()
+        sensor_data['humidity'] = bme280.get_humidity()
+
+        return sensor_data
 
     def get_open_meteo_air_quality(self, lat, long):
         url = OPEN_METEO_AIR_QUALITY_URL.format(lat=lat, long=long)
@@ -486,6 +514,7 @@ class Weather_local(BasePlugin):
             raise RuntimeError("Failed to retrieve Open-Meteo air quality data.")
         
         return response.json()
+    
     
     def format_time(self, dt, time_format, hour_only=False, include_am_pm=True):
         """Format datetime based on 12h or 24h preference"""
