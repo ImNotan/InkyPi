@@ -371,6 +371,23 @@ class Weather_local(BasePlugin):
             "icon": self.get_plugin_dir('icons/wind.png')
         })
 
+        # UV Index
+        uv_index_hourly_times = aqi_data.get('hourly', {}).get('time', [])
+        uv_index_values = aqi_data.get('hourly', {}).get('uv_index', [])
+        current_uv_index = "N/A"
+        for i, time_str in enumerate(uv_index_hourly_times):
+            try:
+                if datetime.fromisoformat(time_str).astimezone(tz).hour == current_time.hour:
+                    current_uv_index = uv_index_values[i]
+                    break
+            except ValueError:
+                logger.warning(f"Could not parse time string {time_str} for UV Index.")
+                continue
+        data_points.append({
+            "label": "UV Index", "measurement": current_uv_index, "unit": '',
+            "icon": self.get_plugin_dir('icons/uvi.png')
+        })
+
         # Humidity
         current_humidity = "N/A"
         humidity_hourly_times = hourly_data.get('time', [])
@@ -388,39 +405,29 @@ class Weather_local(BasePlugin):
             "icon": self.get_plugin_dir('icons/humidity.png')
         })
 
-        # Pressure
-        current_pressure = "N/A"
-        pressure_hourly_times = hourly_data.get('time', [])
-        pressure_values = hourly_data.get('surface_pressure', [])
-        for i, time_str in enumerate(pressure_hourly_times):
-            try:
-                if datetime.fromisoformat(time_str).astimezone(tz).hour == current_time.hour:
-                    current_pressure = int(pressure_values[i])
-                    break
-            except ValueError:
-                logger.warning(f"Could not parse time string {time_str} for pressure.")
-                continue
+        # Indoor Humidity
+        current_indoor_humidity = int(round(sensor_data['humidity'], 0))
         data_points.append({
-            "label": "Pressure", "measurement": current_pressure, "unit": 'hPa',
-            "icon": self.get_plugin_dir('icons/pressure.png')
+            "label": "Indoor Humidity", "measurement": current_indoor_humidity, "unit": '%',
+            "icon": self.get_plugin_dir('icons/humidity.png')
         })
 
-        # UV Index
-        uv_index_hourly_times = aqi_data.get('hourly', {}).get('time', [])
-        uv_index_values = aqi_data.get('hourly', {}).get('uv_index', [])
-        current_uv_index = "N/A"
-        for i, time_str in enumerate(uv_index_hourly_times):
-            try:
-                if datetime.fromisoformat(time_str).astimezone(tz).hour == current_time.hour:
-                    current_uv_index = uv_index_values[i]
-                    break
-            except ValueError:
-                logger.warning(f"Could not parse time string {time_str} for UV Index.")
-                continue
-        data_points.append({
-            "label": "UV Index", "measurement": current_uv_index, "unit": '',
-            "icon": self.get_plugin_dir('icons/uvi.png')
-        })
+        # Pressure
+        # current_pressure = "N/A"
+        # pressure_hourly_times = hourly_data.get('time', [])
+        # pressure_values = hourly_data.get('surface_pressure', [])
+        # for i, time_str in enumerate(pressure_hourly_times):
+        #     try:
+        #         if datetime.fromisoformat(time_str).astimezone(tz).hour == current_time.hour:
+        #             current_pressure = int(pressure_values[i])
+        #             break
+        #     except ValueError:
+        #         logger.warning(f"Could not parse time string {time_str} for pressure.")
+        #         continue
+        # data_points.append({
+        #     "label": "Pressure", "measurement": current_pressure, "unit": 'hPa',
+        #     "icon": self.get_plugin_dir('icons/pressure.png')
+        # })
 
         # Visibility
         current_visibility = "N/A"
@@ -471,19 +478,12 @@ class Weather_local(BasePlugin):
             "unit": scale, "icon": self.get_plugin_dir('icons/aqi.png')
         })
 
-        # Indoor Humidity
-        current_indoor_humidity = int(round(sensor_data['humidity'], 0))
-        data_points.append({
-            "label": "Indoor Humidity", "measurement": current_indoor_humidity, "unit": '%',
-            "icon": self.get_plugin_dir('icons/humidity.png')
-        })
-
         # Indoor Pressure
-        current_indoor_pressure = int(round(sensor_data['pressure'], 0))
-        data_points.append({
-            "label": "Indoor Pressure", "measurement": current_indoor_pressure, "unit": 'hPa',
-            "icon": self.get_plugin_dir('icons/pressure.png')
-        })
+        # current_indoor_pressure = int(round(sensor_data['pressure'], 0))
+        # data_points.append({
+        #     "label": "Indoor Pressure", "measurement": current_indoor_pressure, "unit": 'hPa',
+        #     "icon": self.get_plugin_dir('icons/pressure.png')
+        # })
 
         return data_points
 
