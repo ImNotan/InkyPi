@@ -160,8 +160,8 @@
             const chartTop = chartArea.top + ((30 - maxTemp) * heightPerTemp)
 
             const gradient = ctx.createLinearGradient(0, chartBottom, 0, chartTop);
-            gradient.addColorStop(0, 'lightblue');
-            gradient.addColorStop(0.5, 'yellow');
+            gradient.addColorStop(0, 'deepskyblue');
+            gradient.addColorStop(0.5, 'gold');
             gradient.addColorStop(1, 'orange');
             return gradient;
           },
@@ -179,9 +179,9 @@
             const chartTop = chartArea.top + ((30 - maxTemp) * heightPerTemp)
 
             const gradient = ctx.createLinearGradient(0, chartBottom, 0, chartTop);
-            gradient.addColorStop(0, 'rgba(173, 216, 230, 0.3)');
-            gradient.addColorStop(0.5, 'rgba(255, 255, 0, 0.3)');
-            gradient.addColorStop(1, 'rgba(241, 122, 36, 0.3)');
+            gradient.addColorStop(0, 'rgba(0, 191, 255, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.3)');
+            gradient.addColorStop(1, 'rgba(255, 165, 0, 0.3)');
             return gradient;
           },
           fill: true //Enable filling under Graph
