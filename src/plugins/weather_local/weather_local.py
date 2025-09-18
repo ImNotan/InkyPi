@@ -164,65 +164,6 @@ class Weather_local(BasePlugin):
             
         return icon
 
-    def parse_forecast(self, daily_forecast, tz):
-        """
-        - daily_forecast: list of daily entries from One‑Call v3 (each has 'dt', 'weather', 'temp', 'moon_phase')
-        - tz: your target tzinfo (e.g. from zoneinfo or pytz)
-        """
-        PHASES = [
-            (0.0, "newmoon"),
-            (0.25, "firstquarter"),
-            (0.5, "fullmoon"),
-            (0.75, "lastquarter"),
-            (1.0, "newmoon"),
-        ]
-
-        def choose_phase_name(phase: float) -> str:
-            for target, name in PHASES:
-                if math.isclose(phase, target, abs_tol=1e-3):
-                    return name
-            if 0.0 < phase < 0.25:
-                return "waxingcrescent"
-            elif 0.25 < phase < 0.5:
-                return "waxinggibbous"
-            elif 0.5 < phase < 0.75:
-                return "waninggibbous"
-            else:
-                return "waningcrescent"
-
-        forecast = []
-        for day in daily_forecast:
-            # --- weather icon ---
-            weather_icon = day["weather"][0]["icon"]  # e.g. "10d", "01n"
-            # always show day‑style icon
-            weather_icon = weather_icon.replace("n", "d")
-            weather_icon_path = self.get_plugin_dir(f"icons/{weather_icon}.png")
-
-            # --- moon phase & icon ---
-            moon_phase = float(day["moon_phase"])  # [0.0–1.0]
-            phase_name = choose_phase_name(moon_phase)
-            moon_icon_path = self.get_plugin_dir(f"icons/{phase_name}.png")
-            # --- true illumination percent, no decimals ---
-            illum_fraction = (1 - math.cos(2 * math.pi * moon_phase)) / 2
-            moon_pct = f"{illum_fraction * 100:.0f}"
-
-            # --- date & temps ---
-            dt = datetime.fromtimestamp(day["dt"], tz=timezone.utc).astimezone(tz)
-            day_label = dt.strftime("%a")
-
-            forecast.append(
-                {
-                    "day": day_label,
-                    "high": int(day["temp"]["max"]),
-                    "low": int(day["temp"]["min"]),
-                    "icon": weather_icon_path,
-                    "moon_phase_pct": moon_pct,
-                    "moon_phase_icon": moon_icon_path,
-                }
-            )
-
-        return forecast
-
     def parse_open_meteo_forecast(self, daily_data, tz):
         """
         Parse the daily forecast from Open-Meteo API and inject moon phase from Farmsense API.

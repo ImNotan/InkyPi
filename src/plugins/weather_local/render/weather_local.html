@@ -143,11 +143,32 @@
           type: 'line',
           label: 'Hourly Temperature',
           data: temperatures,
-          borderColor: 'rgba(241, 122, 36, 0.9)', // Line color
           borderWidth: 2,
           pointRadius: 0, // Hide points
-          fill: true, // Enable filling the area under the line
-          tension: 0.5
+          tension: 0.5,
+          borderColor: (context) => {
+            const { chart } = context;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return null;
+
+            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop((10 - minTemp) / (maxTemp - minTemp), 'lightblue');
+            gradient.addColorStop((20 - minTemp) / (maxTemp - minTemp), 'yellow');
+            gradient.addColorStop((30 - minTemp) / (maxTemp - minTemp), 'orange');
+            return gradient;
+          },
+          backgroundColor: (context) => {
+            const { chart } = context;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return null;
+
+            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop((10 - minTemp) / (maxTemp - minTemp), 'rgba(173, 216, 230, 0.3)');
+            gradient.addColorStop((20 - minTemp) / (maxTemp - minTemp), 'rgba(255, 255, 0, 0.3)');
+            gradient.addColorStop((30 - minTemp) / (maxTemp - minTemp), 'rgba(241, 122, 36, 0.3)');
+            return gradient;
+          },
+          fill: true //Enable filling under Graph
         },
         {
           type: 'bar',
