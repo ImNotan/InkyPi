@@ -151,10 +151,18 @@
             const { ctx, chartArea } = chart;
             if (!chartArea) return null;
 
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop((10 - minTemp) / (maxTemp - minTemp), 'lightblue');
-            gradient.addColorStop((20 - minTemp) / (maxTemp - minTemp), 'yellow');
-            gradient.addColorStop((30 - minTemp) / (maxTemp - minTemp), 'orange');
+            const tempSpan = maxTemp - minTemp;
+            const AreaSpan = chartArea.top - chartArea.bottom;
+
+            const heightPerTemp = AreaSpan / tempSpan;
+
+            const chartBottom = chartArea.bottom - ((minTemp - 10) * heightPerTemp)
+            const chartTop = chartArea.top + ((30 - maxTemp) * heightPerTemp)
+
+            const gradient = ctx.createLinearGradient(0, chartBottom, 0, chartTop);
+            gradient.addColorStop(0, 'lightblue');
+            gradient.addColorStop(0.5, 'yellow');
+            gradient.addColorStop(1, 'orange');
             return gradient;
           },
           backgroundColor: (context) => {
@@ -162,10 +170,18 @@
             const { ctx, chartArea } = chart;
             if (!chartArea) return null;
 
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop((10 - minTemp) / (maxTemp - minTemp), 'rgba(173, 216, 230, 0.3)');
-            gradient.addColorStop((20 - minTemp) / (maxTemp - minTemp), 'rgba(255, 255, 0, 0.3)');
-            gradient.addColorStop((30 - minTemp) / (maxTemp - minTemp), 'rgba(241, 122, 36, 0.3)');
+            const tempSpan = maxTemp - minTemp;
+            const AreaSpan = chartArea.top - chartArea.bottom;
+
+            const heightPerTemp = AreaSpan / tempSpan;
+
+            const chartBottom = chartArea.bottom - ((minTemp - 10) * heightPerTemp)
+            const chartTop = chartArea.top + ((30 - maxTemp) * heightPerTemp)
+
+            const gradient = ctx.createLinearGradient(0, chartBottom, 0, chartTop);
+            gradient.addColorStop(0, 'rgba(173, 216, 230, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(255, 255, 0, 0.3)');
+            gradient.addColorStop(1, 'rgba(241, 122, 36, 0.3)');
             return gradient;
           },
           fill: true //Enable filling under Graph
@@ -270,16 +286,6 @@
     chart.update();
 
     // Now, after the chart is created, we can access the scales
-    const gradientStart = chart.scales['y'].getPixelForValue(maxTemp); // Max temperature
-    const gradientEnd = chart.scales['y'].getPixelForValue(minTemp);   // Min temperature
-
-    // Create gradient based on y-axis values
-    const tempGradient = ctx.createLinearGradient(0, gradientStart, 0, gradientEnd+10);
-    tempGradient.addColorStop(0, 'rgba(252,204,5, 0.95)'); // Top of the gradient (max temperature)
-    tempGradient.addColorStop(1, 'rgba(252,204,5, 0.01)'); // Bottom of the gradient (min temperature)
-
-    // Update the chart to apply the gradient
-    chart.data.datasets[0].backgroundColor = tempGradient;
 
     // Create gradient based on y-axis values
     const precipitationGradient = ctx.createLinearGradient(0, gradientStart, 0, gradientEnd);

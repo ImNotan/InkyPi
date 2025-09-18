@@ -12,16 +12,49 @@
                 "name": "Default",
                 "start_time": "00:00",
                 "end_time": "24:00",
-                "plugins": [],
+                "plugins": [
+                    {
+                        "plugin_id": "weather_local",
+                        "name": "w",
+                        "plugin_settings": {
+                            "latitude": "48.95713650021838",
+                            "longitude": "11.6015625",
+                            "weatherProvider": "OpenMeteo",
+                            "units": "metric",
+                            "titleSelection": "custom",
+                            "customTitle": "w",
+                            "displayRefreshTime": "true",
+                            "displayMetrics": "true",
+                            "displayGraph": "true",
+                            "displayRain": "true",
+                            "displayForecast": "true",
+                            "forecastDays": "7",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 3600
+                        },
+                        "latest_refresh_time": "2025-09-18T08:49:06.841805+00:00"
+                    }
+                ],
                 "current_plugin_index": null
             }
         ],
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2025-09-17T14:01:45.895775+00:00",
-        "image_hash": "86b92bcb01eeeddbbfa62df19992c8168c028da2775745c117ab3b45dae326fc",
-        "refresh_type": "Manual Update",
-        "plugin_id": "weather_local"
+        "refresh_time": "2025-09-18T08:49:06.841805+00:00",
+        "image_hash": "09c3aa336ae456037524f589448df2fe8f238202f0445c3ecc3bbdbfc4f5e8cf",
+        "refresh_type": "Playlist",
+        "plugin_id": "weather_local",
+        "playlist": "Default",
+        "plugin_instance": "w"
     }
 }

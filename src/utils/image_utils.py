@@ -7,6 +7,8 @@ import hashlib
 import tempfile
 import subprocess
 
+from config import Config
+
 logger = logging.getLogger(__name__)
 
 def get_image(image_url):
@@ -107,50 +109,53 @@ def take_screenshot(target, dimensions, timeout_ms=None):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_file:
             img_file_path = img_file.name
 
-        command = [
-            "chromium-headless-shell",
-            target,
-            "--headless",
-            f"--screenshot={img_file_path}",
-            f"--window-size={dimensions[0]},{dimensions[1]}",
-            "--disable-dev-shm-usage",
-            "--disable-gpu",
-            "--use-gl=swiftshader",
-            "--hide-scrollbars",
-            "--in-process-gpu",
-            "--js-flags=--jitless",
-            "--disable-zero-copy",
-            "--disable-gpu-memory-buffer-compositor-resources",
-            "--disable-extensions",
-            "--disable-plugins",
-            "--mute-audio",
-            "--no-sandbox"
-        ]
-        # command = [
-        #     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        #     target,
-        #     "--headless",
-        #     f"--screenshot={img_file_path}",
-        #     f"--window-size={dimensions[0]},{dimensions[1]}",
-        #     "--disable-dev-shm-usage",
-        #     "--disable-gpu",
-        #     "--use-gl=swiftshader",
-        #     "--hide-scrollbars",
-        #     "--in-process-gpu",
-        #     "--js-flags=--jitless",
-        #     "--disable-zero-copy",
-        #     "--disable-gpu-memory-buffer-compositor-resources",
-        #     "--disable-extensions",
-        #     "--disable-plugins",
-        #     "--mute-audio",
-        #     "--no-sandbox",
-        #     "--disable-canvas-aa",
-        #     "--disable-2d-canvas-clip-aa",
-        #     "--disable-font-subpixel-positioning",
-        #     "--disable-lcd-text",
-        #     "--disable-gpu-compositing",
-        #     "--disable-dithering"
-        # ]
+        if Config.DEV_MODE:
+            command = [
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                target,
+                "--headless",
+                f"--screenshot={img_file_path}",
+                f"--window-size={dimensions[0]},{dimensions[1]}",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--use-gl=swiftshader",
+                "--hide-scrollbars",
+                "--in-process-gpu",
+                "--js-flags=--jitless",
+                "--disable-zero-copy",
+                "--disable-gpu-memory-buffer-compositor-resources",
+                "--disable-extensions",
+                "--disable-plugins",
+                "--mute-audio",
+                "--no-sandbox"#,
+                # "--disable-canvas-aa",
+                # "--disable-2d-canvas-clip-aa",
+                # "--disable-font-subpixel-positioning",
+                # "--disable-lcd-text",
+                # "--disable-gpu-compositing",
+                # "--disable-dithering"
+            ]
+        else:
+            command = [
+                "chromium-headless-shell",
+                target,
+                "--headless",
+                f"--screenshot={img_file_path}",
+                f"--window-size={dimensions[0]},{dimensions[1]}",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--use-gl=swiftshader",
+                "--hide-scrollbars",
+                "--in-process-gpu",
+                "--js-flags=--jitless",
+                "--disable-zero-copy",
+                "--disable-gpu-memory-buffer-compositor-resources",
+                "--disable-extensions",
+                "--disable-plugins",
+                "--mute-audio",
+                "--no-sandbox"
+            ]
+        
 
         if timeout_ms:
             command.append(f"--timeout={timeout_ms}")

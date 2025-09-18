@@ -146,6 +146,7 @@
   font-size: min(32cqh, 15cqi);
   text-align: center;
   font-weight: lighter;
+  white-space: nowrap;
   height: 30%
 }
 

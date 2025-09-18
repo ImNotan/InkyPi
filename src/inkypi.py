@@ -41,11 +41,11 @@ args = parser.parse_args()
 # Set development mode settings
 if args.dev:
     Config.config_file = os.path.join(Config.BASE_DIR, "config", "device_dev.json")
-    DEV_MODE = True
+    Config.DEV_MODE = True
     PORT = 8080
     logger.info("Starting InkyPi in DEVELOPMENT mode on port 8080")
 else:
-    DEV_MODE = False
+    Config.DEV_MODE = False
     PORT = 80
     logger.info("Starting InkyPi in PRODUCTION mode on port 80")
 logging.getLogger('waitress.queue').setLevel(logging.ERROR)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         app.secret_key = str(random.randint(100000,999999))
         
         # Get local IP address for display (only in dev mode when running on non-Pi)
-        if DEV_MODE:
+        if Config.DEV_MODE:
             import socket
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

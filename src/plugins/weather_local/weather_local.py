@@ -7,13 +7,15 @@ from datetime import datetime, timezone
 import pytz
 from io import BytesIO
 import math
+from config import Config
 
-from smbus2 import SMBus
-from bme280 import BME280
+if not Config.DEV_MODE:
+    from smbus2 import SMBus
+    from bme280 import BME280
 
-# Initialise the BME280
-bus = SMBus(1)
-bme280 = BME280(i2c_dev=bus)
+    # Initialise the BME280
+    bus = SMBus(1)
+    bme280 = BME280(i2c_dev=bus)
 
 logger = logging.getLogger(__name__)
 
@@ -441,9 +443,14 @@ class Weather_local(BasePlugin):
 
     def get_sensor_data(self):
         sensor_data = {}
-        sensor_data['temperature'] = bme280.get_temperature()
-        sensor_data['pressure'] = bme280.get_pressure()
-        sensor_data['humidity'] = bme280.get_humidity()
+        if Config.DEV_MODE:
+            sensor_data['temperature'] = 20
+            sensor_data['pressure'] = 1000
+            sensor_data['humidity'] = 50
+        else:
+            sensor_data['temperature'] = bme280.get_temperature()
+            sensor_data['pressure'] = bme280.get_pressure()
+            sensor_data['humidity'] = bme280.get_humidity()
 
         return sensor_data
 

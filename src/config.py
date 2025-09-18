@@ -19,6 +19,8 @@ class Config:
     # Directory path for storing plugin instance images
     plugin_image_dir = os.path.join(BASE_DIR, "static", "images", "plugins")
 
+    DEV_MODE = False
+
     def __init__(self):
         self.config = self.read_config()
         self.plugins_list = self.read_plugins_list()
