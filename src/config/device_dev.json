@@ -41,7 +41,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2025-09-18T09:15:34.849865+00:00"
+                        "latest_refresh_time": "2025-09-21T18:44:12.576497+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -50,8 +50,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2025-09-18T09:15:34.849865+00:00",
-        "image_hash": "46dd29bd0cc3585d9879b0b6bde22ec51e796223f852f1dbedfa76108170cf68",
+        "refresh_time": "2025-09-21T18:44:12.576497+00:00",
+        "image_hash": "a4f05bdd38ba8e6f22c1350f1e91d27fbbc271cf10324795357c71e8cd90622d",
         "refresh_type": "Playlist",
         "plugin_id": "weather_local",
         "playlist": "Default",

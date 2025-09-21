@@ -448,14 +448,14 @@ class Weather_local(BasePlugin):
     def get_sensor_data(self):
         sensor_data = {}
         if Config.DEV_MODE:
-            sensor_data['temperature'] = 20 
+            sensor_data['temp_sensor'] = [20] 
             sensor_data['pressure'] = 1000
             sensor_data['humidity'] = 50
         else:
             with open(SENSOR_FILE, 'r', encoding='utf-8') as f:
                 fcntl.flock(f, fcntl.LOCK_SH)
                 sensor_data = json.load(f) 
-
+        print(sensor_data)
         return sensor_data
 
     def get_open_meteo_air_quality(self, lat, long):
