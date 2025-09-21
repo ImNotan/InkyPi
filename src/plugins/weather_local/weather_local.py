@@ -8,6 +8,8 @@ import pytz
 from io import BytesIO
 import math
 from config import Config
+import fcntl
+import json
 
 if not Config.DEV_MODE:
     from smbus2 import SMBus
@@ -42,6 +44,8 @@ OPEN_METEO_UNIT_PARAMS = {
     "metric":   "temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm",
     "imperial": "temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch"
 }
+
+SENSOR_FILE = "/home/anton/tempRecorder/tempRecording.json"
 
 class Weather_local(BasePlugin):
     def generate_settings_template(self):
@@ -117,7 +121,7 @@ class Weather_local(BasePlugin):
             "current_day_icon": self.get_plugin_dir(f'icons/{current_icon}.png'),
             "current_temperature": str(round(current.get("temperature", 0))),
             "feels_like": str(round(current.get("apparent_temperature", current.get("temperature", 0)))),
-            "indoor_temperature": round(sensor_data['temperature'], 1),
+            "indoor_temperature": round(sensor_data['temp_sensor'][-1], 1),
             "temperature_unit": UNITS[units]["temperature"],
             "units": units,
             "time_format": time_format
@@ -444,13 +448,13 @@ class Weather_local(BasePlugin):
     def get_sensor_data(self):
         sensor_data = {}
         if Config.DEV_MODE:
-            sensor_data['temperature'] = 20
+            sensor_data['temperature'] = 20 
             sensor_data['pressure'] = 1000
             sensor_data['humidity'] = 50
         else:
-            sensor_data['temperature'] = bme280.get_temperature()
-            sensor_data['pressure'] = bme280.get_pressure()
-            sensor_data['humidity'] = bme280.get_humidity()
+            with open(SENSOR_FILE, 'r', encoding='utf-8') as f:
+                fcntl.flock(f, fcntl.LOCK_SH)
+                sensor_data = json.load(f) 
 
         return sensor_data
 
