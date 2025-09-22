@@ -11,14 +11,6 @@ from config import Config
 import fcntl
 import json
 
-if not Config.DEV_MODE:
-    from smbus2 import SMBus
-    from bme280 import BME280
-
-    # Initialise the BME280
-    bus = SMBus(1)
-    bme280 = BME280(i2c_dev=bus)
-
 logger = logging.getLogger(__name__)
 
 UNITS = {
@@ -220,24 +212,6 @@ class Weather_local(BasePlugin):
             })
 
         return forecast
-
-    def parse_hourly(self, hourly_forecast, tz, time_format, units):
-        hourly = []
-        for hour in hourly_forecast[:24]:
-            dt = datetime.fromtimestamp(hour.get('dt'), tz=timezone.utc).astimezone(tz)
-            rain_mm = hour.get("rain", {}).get("1h", 0.0)
-            if units == "imperial":
-                rain = rain_mm / 25.4
-            else:
-                rain = rain_mm 
-            hour_forecast = {
-                "time": self.format_time(dt, time_format, hour_only=True),
-                "temperature": int(hour.get("temp")),
-                "precipitation": hour.get("pop"),
-                "rain": round(rain, 2)
-            }
-            hourly.append(hour_forecast)
-        return hourly
 
     def parse_open_meteo_hourly(self, hourly_data, tz, time_format):
         hourly = []
