@@ -111,9 +111,9 @@ class Weather_local(BasePlugin):
         data = {
             "current_date": dt.strftime("%A, %B %d"),
             "current_day_icon": self.get_plugin_dir(f'icons/{current_icon}.png'),
-            "current_temperature": str(round(current.get("temperature", 0))),
+            "current_temperature": str(round(current.get("temperature", 1))),
             "feels_like": str(round(current.get("apparent_temperature", current.get("temperature", 0)))),
-            "indoor_temperature": round(sensor_data['temp_sensor'][-1], 1),
+            "indoor_temperature": str(round(sensor_data['temp_sensor'][-1], 1)),
             "temperature_unit": UNITS[units]["temperature"],
             "units": units,
             "time_format": time_format
@@ -122,7 +122,7 @@ class Weather_local(BasePlugin):
         data['forecast'] = self.parse_open_meteo_forecast(weather_data.get('daily', {}), tz)
         data['data_points'] = self.parse_open_meteo_data_points(weather_data, aqi_data, sensor_data, tz, units, time_format)
         
-        data['hourly_forecast'] = self.parse_open_meteo_hourly(weather_data.get('hourly', {}), tz, time_format)
+        data['hourly_forecast'] = self.parse_open_meteo_hourly(weather_data.get('hourly', {}), sensor_data, tz, time_format)
         return data
 
     def map_weather_code_to_icon(self, weather_code, hour):
@@ -213,18 +213,32 @@ class Weather_local(BasePlugin):
 
         return forecast
 
-    def parse_open_meteo_hourly(self, hourly_data, tz, time_format):
+    def parse_open_meteo_hourly(self, hourly_data, sensor_data, tz, time_format):
         hourly = []
         times = hourly_data.get('time', [])
         temperatures = hourly_data.get('temperature_2m', [])
+        indoor_temperatures = sensor_data.get('temp_sensor', [])
+        indoor_times = sensor_data.get('time', [])
         precipitation_probabilities = hourly_data.get('precipitation_probability', [])
         rain = hourly_data.get('precipitation', [])
         current_time_in_tz = datetime.now(tz)
         start_index = 0
+        indoor_start_index = 0
+        # for i, time_str in enumerate(times):
+        #     try:
+        #         dt_hourly = datetime.fromisoformat(time_str).astimezone(tz)
+        #         if dt_hourly.date() == current_time_in_tz.date() and dt_hourly.hour >= current_time_in_tz.hour:
+        #             start_index = i
+        #             break
+        #         if dt_hourly.date() > current_time_in_tz.date():
+        #             break
+        #     except ValueError:
+        #         logger.warning(f"Could not parse time string {time_str} in hourly data.")
+        #         continue
         for i, time_str in enumerate(times):
             try:
                 dt_hourly = datetime.fromisoformat(time_str).astimezone(tz)
-                if dt_hourly.date() == current_time_in_tz.date() and dt_hourly.hour >= current_time_in_tz.hour:
+                if dt_hourly.date() == current_time_in_tz.date():
                     start_index = i
                     break
                 if dt_hourly.date() > current_time_in_tz.date():
@@ -233,18 +247,34 @@ class Weather_local(BasePlugin):
                 logger.warning(f"Could not parse time string {time_str} in hourly data.")
                 continue
 
+        for i, time_str in enumerate(indoor_times):
+            try:
+                dt_hourly = datetime.fromisoformat(time_str).astimezone(tz)
+                if dt_hourly.date() == current_time_in_tz.date():
+                    indoor_start_index = i
+                    break
+                if dt_hourly.date() > current_time_in_tz.date():
+                    break
+            except ValueError:
+                logger.warning(f"Could not parse time string {time_str} in indoor sensor data.")
+                continue
+
         sliced_times = times[start_index:]
         sliced_temperatures = temperatures[start_index:]
         sliced_precipitation_probabilities = precipitation_probabilities[start_index:]
         sliced_rain = rain[start_index:]
 
+        sliced_indoor_times = indoor_times[indoor_start_index:]
+        sliced_indoor_temperatures = indoor_temperatures[indoor_start_index:]
+
         for i in range(min(24, len(sliced_times))):
             dt = datetime.fromisoformat(sliced_times[i]).astimezone(tz)
             hour_forecast = {
                 "time": self.format_time(dt, time_format, True),
-                "temperature": int(sliced_temperatures[i]) if i < len(sliced_temperatures) else 0,
+                "temperature": sliced_temperatures[i] if i < len(sliced_temperatures) else 0,
                 "precipitation": (sliced_precipitation_probabilities[i] / 100) if i < len(sliced_precipitation_probabilities) else 0,
-                "rain": (sliced_rain[i]) if i < len(sliced_rain) else 0
+                "rain": (sliced_rain[i]) if i < len(sliced_rain) else 0,
+                "indoor_temperature": sliced_indoor_temperatures[i] if i < len(sliced_indoor_temperatures) else 0
             }
             hourly.append(hour_forecast)
         return hourly
@@ -422,6 +452,7 @@ class Weather_local(BasePlugin):
     def get_sensor_data(self):
         sensor_data = {}
         if Config.DEV_MODE:
+            sensor_data["time"] = [datetime.now().strftime('%Y-%m-%dT%H:%M')]
             sensor_data['temp_sensor'] = [20] 
             sensor_data['pressure'] = 1000
             sensor_data['humidity'] = 50
@@ -429,7 +460,6 @@ class Weather_local(BasePlugin):
             with open(SENSOR_FILE, 'r', encoding='utf-8') as f:
                 fcntl.flock(f, fcntl.LOCK_SH)
                 sensor_data = json.load(f) 
-        print(sensor_data)
         return sensor_data
 
     def get_open_meteo_air_quality(self, lat, long):

@@ -89,14 +89,15 @@
     const temperatures = [{% for hour in hourly_forecast %}{{ hour.temperature }}{% if not loop.last %}, {% endif %}{% endfor %}];
     const precipitation = [{% for hour in hourly_forecast %}{{ hour.precipitation * 100}}{% if not loop.last %}, {% endif %}{% endfor %}]; // Convert to percentage
     const rain = [{% for hour in hourly_forecast %}{{ hour.rain or 0 }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    const indoor_temperatures = [{% for hour in hourly_forecast %}{{ hour.indoor_temperature }}{% if not loop.last %}, {% endif %}{% endfor %}];
 	const units = document.getElementById('units-container').dataset.units;
 	const isImperial = units === "imperial";
 	const unit = isImperial ? "in" : "mm";
 	const threshold = isImperial ? 0.0035 : 0.09;
 	
     // Find min and max temperatures
-    const minTemp = Math.min(...temperatures);
-    var maxTemp = Math.max(...temperatures);
+    const minTemp = Math.min(...temperatures, ...indoor_temperatures);
+    var maxTemp = Math.max(...temperatures, ...indoor_temperatures);
 	
     Chart.register({
       id: 'annotationRain',
@@ -203,6 +204,15 @@
           barPercentage: 1.0, // Ensures full width
           categoryPercentage: 1.0,  // Ensures full width
           fill: true, // Enable filling the area under the line
+        },
+        {
+          type: 'line',
+          label: 'Indoor Temperature',
+          data: indoor_temperatures,
+          borderColor: "rgba(0, 0, 0, 1)",
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.5
         }
       ]
       },
