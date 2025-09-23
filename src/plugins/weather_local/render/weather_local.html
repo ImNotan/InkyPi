@@ -96,11 +96,8 @@
 	const threshold = isImperial ? 0.0035 : 0.09;
 	
     // Find min and max temperatures
-    minIndoorTemps = indoor_temperatures.filter(function(val) {
-      return val !== null
-    })
-    const minTemp = Math.min(...temperatures, ...minIndoorTemps);
-    var maxTemp = Math.max(...temperatures, ...minIndoorTemps);
+    const minTemp = Math.min(...temperatures, ...indoor_temperatures);
+    var maxTemp = Math.max(...temperatures, ...indoor_temperatures);
 	
     Chart.register({
       id: 'annotationRain',
