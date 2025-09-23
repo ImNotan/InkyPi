@@ -217,24 +217,6 @@ class Weather_local(BasePlugin):
 
         return forecast
 
-    def parse_hourly(self, hourly_forecast, tz, time_format, units):
-        hourly = []
-        for hour in hourly_forecast[:24]:
-            dt = datetime.fromtimestamp(hour.get('dt'), tz=timezone.utc).astimezone(tz)
-            rain_mm = hour.get("rain", {}).get("1h", 0.0)
-            if units == "imperial":
-                rain = rain_mm / 25.4
-            else:
-                rain = rain_mm 
-            hour_forecast = {
-                "time": self.format_time(dt, time_format, hour_only=True),
-                "temperature": int(hour.get("temp")),
-                "precipitation": hour.get("pop"),
-                "rain": round(rain, 2)
-            }
-            hourly.append(hour_forecast)
-        return hourly
-
     def parse_open_meteo_hourly(self, hourly_data, tz, time_format):
         hourly = []
         times = hourly_data.get('time', [])
@@ -264,7 +246,7 @@ class Weather_local(BasePlugin):
             dt = datetime.fromisoformat(sliced_times[i]).astimezone(tz)
             hour_forecast = {
                 "time": self.format_time(dt, time_format, True),
-                "temperature": int(sliced_temperatures[i]) if i < len(sliced_temperatures) else 0,
+                "temperature": round(sliced_temperatures[i], 1) if i < len(sliced_temperatures) else 0,
                 "precipitation": (sliced_precipitation_probabilities[i] / 100) if i < len(sliced_precipitation_probabilities) else 0,
                 "rain": (sliced_rain[i]) if i < len(sliced_rain) else 0
             }
